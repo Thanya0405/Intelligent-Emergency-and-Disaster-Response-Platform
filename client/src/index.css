@@ -1,0 +1,148 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-bg-primary text-white font-body antialiased;
+    min-height: 100vh;
+    background-color: #0a0a0f;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #111827;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.4);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.7);
+  }
+
+  ::selection {
+    background: rgba(59, 130, 246, 0.3);
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl;
+  }
+
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.07] hover:border-white/20 hover:shadow-lg hover:shadow-blue-500/10;
+  }
+
+  .btn-primary {
+    @apply bg-brand-primary hover:bg-blue-400 text-white font-medium px-6 py-3 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 focus:ring-offset-transparent active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply bg-brand-secondary hover:bg-violet-400 text-white font-medium px-6 py-3 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:ring-offset-2 focus:ring-offset-transparent active:scale-95;
+  }
+
+  .btn-danger {
+    @apply bg-status-danger hover:bg-red-400 text-white font-medium px-6 py-3 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-status-danger focus:ring-offset-2 focus:ring-offset-transparent active:scale-95;
+  }
+
+  .btn-ghost {
+    @apply bg-white/5 hover:bg-white/10 text-white font-medium px-6 py-3 rounded-xl border border-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/20;
+  }
+
+  .input-field {
+    @apply w-full bg-white/5 border border-white/10 text-white placeholder-white/30 rounded-xl px-4 py-3 font-body focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent transition-all duration-200;
+  }
+
+  .status-safe {
+    @apply bg-status-success/20 text-status-success border border-status-success/30;
+  }
+
+  .status-warning {
+    @apply bg-status-warning/20 text-status-warning border border-status-warning/30;
+  }
+
+  .status-danger {
+    @apply bg-status-danger/20 text-status-danger border border-status-danger/30;
+  }
+
+  .skeleton {
+    @apply bg-white/5 animate-pulse rounded-lg;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-brand-primary to-brand-secondary bg-clip-text text-transparent;
+  }
+
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:text-white hover:bg-white/5 transition-all duration-200 font-medium text-sm;
+  }
+
+  .sidebar-link-active {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-white bg-brand-primary/20 border border-brand-primary/30 font-medium text-sm;
+  }
+}
+
+/* Leaflet overrides */
+.leaflet-container {
+  background: #0d1117 !important;
+  font-family: 'Inter', sans-serif;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #111827 !important;
+  color: white !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: 12px !important;
+}
+
+.leaflet-popup-tip {
+  background: #111827 !important;
+}
+
+/* Custom pulse ring for SOS */
+@keyframes sos-pulse {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+.sos-ring {
+  animation: sos-pulse 1.5s ease-out infinite;
+}
+
+/* Radar sweep */
+@keyframes sweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.radar-sweep {
+  animation: sweep 4s linear infinite;
+  transform-origin: center bottom;
+}
+
+/* Scan line */
+@keyframes scan {
+  0% { top: 0; opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.scan-line {
+  animation: scan 2s ease-in-out infinite;
+}
