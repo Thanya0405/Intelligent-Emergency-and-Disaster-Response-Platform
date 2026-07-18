@@ -4,19 +4,38 @@ import toast from 'react-hot-toast';
 
 const AuthContext = createContext(null);
 
+// Demo user — used when no account is logged in
+const DEMO_USER = {
+  _id: 'demo_user_001',
+  name: 'Demo User',
+  email: 'demo@safeguard.ai',
+  role: 'user',
+  onboardingComplete: true,
+  phone: '',
+  location: { lat: 12.9716, lng: 77.5946, address: 'Bengaluru, India' },
+  createdAt: new Date().toISOString(),
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(() => localStorage.getItem('sg_token'));
 
   const fetchUser = useCallback(async () => {
-    if (!token) { setLoading(false); return; }
+    if (!token) {
+      // No token — auto-login with demo user so app opens directly
+      setUser(DEMO_USER);
+      setLoading(false);
+      return;
+    }
     try {
       const { data } = await api.get('/users/me');
       setUser(data.data);
     } catch {
+      // Token invalid — fall back to demo user
       localStorage.removeItem('sg_token');
       setToken(null);
+      setUser(DEMO_USER);
     } finally {
       setLoading(false);
     }
@@ -47,7 +66,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('sg_token');
     setToken(null);
-    setUser(null);
+    setUser(DEMO_USER); // After logout, fall back to demo user
     delete api.defaults.headers.common['Authorization'];
     toast.success('Logged out safely');
   };
