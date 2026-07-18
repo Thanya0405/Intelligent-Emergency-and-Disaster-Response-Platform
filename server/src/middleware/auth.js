@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+const JWT_SECRET = process.env.JWT_SECRET || 'sg_fallback_dev_secret_key_32chars_min';
+
 const protect = async (req, res, next) => {
   try {
     let token;
@@ -10,7 +12,7 @@ const protect = async (req, res, next) => {
     if (!token) {
       return res.status(401).json({ success: false, message: 'Not authorized, no token' });
     }
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.user = await User.findById(decoded.id).select('-passwordHash');
     if (!req.user) {
       return res.status(401).json({ success: false, message: 'User not found' });

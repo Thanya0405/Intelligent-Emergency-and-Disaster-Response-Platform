@@ -65,14 +65,16 @@ const setupInMemoryMock = () => {
           updatedAt: new Date(),
           ...d
         };
-        // Add instance methods
+        // Store the raw password for comparison in simulation mode
+        const storedPassword = d.passwordHash || d.password;
         item.comparePassword = async function(pass) {
-          // simple check for demo mode
-          return pass === 'admin123' || pass === 'user123';
+          // In simulation mode, compare against stored password or demo passwords
+          return pass === storedPassword || pass === 'admin123' || pass === 'user123';
         };
         item.toJSON = function() {
           const obj = { ...this };
           delete obj.passwordHash;
+          delete obj.password;
           return obj;
         };
         item.toObject = function() {
