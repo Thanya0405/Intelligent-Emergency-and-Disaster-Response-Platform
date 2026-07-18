@@ -5,9 +5,9 @@ const Alert = require('../models/Alert');
 // @route POST /api/ai/first-aid
 const firstAidChat = async (req, res, next) => {
   try {
-    const { message, history } = req.body;
+    const { message, history, image } = req.body;
     if (!message) return res.status(400).json({ success: false, message: 'Message is required' });
-    const result = await geminiService.firstAidChat(message, history || []);
+    const result = await geminiService.firstAidChat(message, history || [], image || null);
     res.json({ success: true, data: result });
   } catch (error) {
     next(error);

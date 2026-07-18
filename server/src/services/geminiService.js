@@ -10,8 +10,11 @@ const initGemini = () => {
   }
   try {
     genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-    console.log('✅ Gemini AI initialized');
+    // Use a multimodal-capable model. gemini-2.0-flash (and 1.5-flash) support
+    // both text and image input. Override via GEMINI_MODEL if needed.
+    const modelName = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+    model = genAI.getGenerativeModel({ model: modelName });
+    console.log(`✅ Gemini AI initialized (model: ${modelName})`);
     return true;
   } catch (e) {
     console.error('❌ Gemini init failed:', e.message);
@@ -31,8 +34,26 @@ const safeJsonParse = (text, fallback) => {
   }
 };
 
-const generateContent = async (prompt) => {
+const generateContent = async (prompt, image) => {
   if (!isAvailable || !model) throw new Error('AI_UNAVAILABLE');
+
+  // If an image is supplied, send it as a proper multimodal part.
+  // `image` must be { data: <base64 string>, mimeType: 'image/png' | 'image/jpeg' | ... }
+  if (image && image.data) {
+    const mimeType = image.mimeType || 'image/png';
+    // Validate we are using a vision-capable model before sending image data.
+    const visionModels = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash', 'gemini-2.0-pro', 'gemini-2.5-flash', 'gemini-2.5-pro'];
+    const currentModel = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+    if (!visionModels.some(m => currentModel.startsWith(m.split('-').slice(0, 2).join('-')))) {
+      throw new Error('IMAGE_NOT_SUPPORTED: the configured Gemini model does not support image input. Use a vision-capable model (e.g. gemini-2.0-flash).');
+    }
+    const result = await model.generateContent([
+      { text: prompt },
+      { inlineData: { data: image.data, mimeType } }
+    ]);
+    return result.response.text();
+  }
+
   const result = await model.generateContent(prompt);
   return result.response.text();
 };
@@ -106,7 +127,7 @@ Respond with ONLY this JSON structure:
 };
 
 // 3. First Aid Assistant (conversational)
-const firstAidChat = async (userMessage, conversationHistory = []) => {
+const firstAidChat = async (userMessage, conversationHistory = [], image = null) => {
   const fallback = {
     response: `For any medical emergency, please call 108 (India) or your local emergency number immediately.
 
@@ -143,7 +164,7 @@ User asks: ${userMessage}
 
 Respond naturally and helpfully with first aid guidance.`;
 
-    const text = await generateContent(prompt);
+    const text = await generateContent(prompt, image);
     return {
       response: text + '\n\n⚠️ DISCLAIMER: Always call 108/112 for emergencies. This AI provides guidance only, not medical advice.',
       disclaimer: true
